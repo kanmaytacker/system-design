@@ -20,6 +20,9 @@
     - [Chunking the content](#chunking-the-content)
     - [Streaming content to the users](#streaming-content-to-the-users-1)
     - [How to handle many concurrent users?](#how-to-handle-many-concurrent-users)
+  - [Recap](#recap)
+    - [Data ingestion](#data-ingestion-1)
+    - [Content streaming](#content-streaming)
   - [Further reading](#further-reading)
 ## How to approach design problems?
 
@@ -218,6 +221,24 @@ Video playback is a very CPU intensive task and require low latencies. The CPU u
 CDN can also reduce latency due to geographical location since the content is streamed from the CDN that is closest to the user.
 
 ![CDN](media/CDN.png)
+
+## Recap
+### Data ingestion
+1. Client requests to upload content to the OTT.
+2. Server stores metadata in the database and generates a presigned URL. The server sends the presigned URL to the client.
+3. Client uploads the content to the file storage using the presigned URL and multipart upload.
+4. Client sends a request to the server to update the metadata on successful upload.
+5. Server sends a message to the message queue to process the content for each format and resolution.
+6. The content is processed asynchronously by workers that compress, transcode, crop and package the content.
+7. The content is finally uploaded to S3 and metadata tables are updated.
+
+### Content streaming
+1. Client requests to play a particular title.
+2. Server sends the details of the chunks to the client.
+3. The data can be served either from the server or a CDN.
+4. Client downloads the chunks as the user watches the content.
+5. Clients can also seek to a particular point in the content. The client can download the chunk that contains the point that the client wants to seek to.
+
 
 ## Further reading
 * [Data flow diagram](https://www.lucidchart.com/pages/data-flow-diagram)
