@@ -53,6 +53,7 @@
       - [Configuration](#configuration)
     - [Setup](#setup-1)
     - [Testing the cluster](#testing-the-cluster)
+  - [Code Glossary](#code-glossary)
   - [References](#references)
 
 ## Motivation
@@ -628,6 +629,15 @@ redis 127.0.0.1:7002> get hello
 -> Redirected to slot [866] located at 172.19.0.4:6379
 "world"
 ```
+
+## Code Glossary
+
+| Description         | Link                                                                                                     |
+| ------------------- | -------------------------------------------------------------------------------------------------------- |
+| `redis.conf`        | [1](https://github.com/kanmaytacker/system-design/blob/master/guides/redis/redis.conf)                   |
+| `create_cluster.sh` | [2](https://github.com/kanmaytacker/system-design/blob/master/guides/redis/create_cluster.sh)            |
+| `Python client`     | [3](https://github.com/kanmaytacker/system-design/blob/master/guides/redis/python/redis-cluster.py#L178) |
+
 
 ## References
 - [Eviction Policies](https://redis.io/docs/reference/eviction/)
