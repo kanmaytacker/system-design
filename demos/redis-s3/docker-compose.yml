@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  localstack:
+    image: localstack/localstack
+    environment:
+      - SERVICES=s3,elasticache
+      - DEFAULT_REGION=us-east-1
+      - REDIS_MAXMEMORY=100mb
+      - REDIS_MAXMEMORY_POLICY=allkeys-lru
+    ports:
+      - "4566:4566"
+      - "4572:4572"
+      - "6379:6379"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"

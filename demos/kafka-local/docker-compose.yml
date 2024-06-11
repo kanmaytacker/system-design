@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  localstack:
+    image: localstack/localstack
+    environment:
+      - SERVICES=kafka
+      - KAFKA_BROKER_ID=1
+      - KAFKA_AUTO_CREATE_TOPICS=true
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_ZOOKEEPER_CONNECT=localhost:2181
+    ports:
+      - "9092:9092"
+      - "2181:2181"
+      - "4566:4566"
