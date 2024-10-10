@@ -24,7 +24,7 @@ PARTITION BY toYYYYMM(createdOn)
 ORDER BY (createdOn, id);
 ```
 
-!!! note This table uses the `MergeTree` engine, which is optimal for read-heavy analytical workloads. The data is partitioned by month (`createdOn`) and ordered primarily by `createdOn` and secondarily by `id` for efficient querying.
+> This table uses the `MergeTree` engine, which is optimal for read-heavy analytical workloads. The data is partitioned by month (`createdOn`) and ordered primarily by `createdOn` and secondarily by `id` for efficient querying.
 
 ### Example Queries
 
