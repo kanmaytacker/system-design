@@ -1,9 +1,17 @@
 # Redis commands
 
-Connect to the Redis server:
+!!! info
+    You should have the Redis server already running through Docker Compose. Verify it by running either:
+      - `docker-compose ps`
+      - `docker exec -it redisjson redis-cli ping`
+
+
+## Connect to Redis
+
+To connect to the Redis server, run the following command:
 
 ```bash
-redis-cli -h localhost -p 6379
+docker exec -it redisjson redis-cli
 ```
 
 ## Basic Redis Commands
