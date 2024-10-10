@@ -1,9 +1,9 @@
 # Redis commands
 
-!!! info
-    You should have the Redis server already running through Docker Compose. Verify it by running either:
-      - `docker-compose ps`
-      - `docker exec -it redisjson redis-cli ping`
+
+> You should have the Redis server already running through Docker Compose. Verify it by running either:
+> - `docker-compose ps`
+> - `docker exec -it redisjson redis-cli ping`
 
 
 ## Connect to Redis

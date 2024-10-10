@@ -14,8 +14,7 @@ You can find the following demos:
 The demos are designed to run on your local machine using `Docker Compose`.
 You can find the `docker-compose.yml` [here](./docker-compose.yml).
 
-!!! note
-    If you don't have Docker or Docker Compose installed, follow the instructions [here](https://docs.docker.com/compose/install/).
+> If you don't have Docker or Docker Compose installed, follow the instructions [here](https://docs.docker.com/compose/install/).
 
 To start the database servers, run the following command from this directory:
 
@@ -23,8 +22,8 @@ To start the database servers, run the following command from this directory:
 docker-compose up -d
 ```
 
-!!! note
-    You should have Docker daemon running on your machine. Verify it by running `docker info`.
+
+> You should have Docker daemon running on your machine. Verify it by running `docker info`.
 
 This command will start the following services:
 - Postgres
@@ -48,11 +47,11 @@ docker-compose down
 
 The file [bookmarks.sql](./bookmarks.sql) contains the schema for a bookmarks database. It also contains some sample data.
 
-!!! note
-    The credentials are defined in the `docker-compose.yml` file. The values are:
-        - POSTGRES_USER: root
-        - POSTGRES_PASSWORD: example
-        - POSTGRES_DB: bookmarks
+
+> The credentials are defined in the `docker-compose.yml` file. The values are:
+    - POSTGRES_USER: root
+    - POSTGRES_PASSWORD: example
+    - POSTGRES_DB: bookmarks
 
 
 To create the schema and load the data, run the following command:
