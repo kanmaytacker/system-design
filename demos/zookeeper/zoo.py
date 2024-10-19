@@ -1,19 +1,18 @@
-from kazoo.client import KazooClient
-from kazoo.recipe.watchers import ChildrenWatch
 import time
 
-# Initialize Zookeeper client
-zk = KazooClient(hosts='127.0.0.1:2181')
-zk.start()
+from kazoo.client import KazooClient
+
 
 def create_ephemeral_node(path, value):
     zk.create(path, value.encode('utf-8'), ephemeral=True)
     print(f"Ephemeral node {path} created with value: {value}")
 
+
 def monitor_children(path):
     @zk.ChildrenWatch(path)
     def watch_children(children):
         print(f"Children of node {path} are now: {children}")
+
 
 def node_died(path):
     @zk.DataWatch(path)
@@ -22,6 +21,7 @@ def node_died(path):
             print(f"Node {path} died")
         else:
             print(f"Node {path} is alive with data: {data.decode('utf-8') if data else 'None'}")
+
 
 def heartbeat_demo(path):
     def heartbeat():
@@ -36,28 +36,33 @@ def heartbeat_demo(path):
     heartbeat_thread.daemon = True
     heartbeat_thread.start()
 
+
+ROOT_PATH = "/demo"
+EPHEMERAL_NODE = "/demo/ephemeral"
+
 if __name__ == "__main__":
-    root_path = "/demo"
-    ephemeral_path = "/demo/ephemeral"
     initial_value = "hello"
     updated_value = "world"
 
+    zk = KazooClient(hosts='127.0.0.1:2181')
+    zk.start()
+
     # Create root node
-    zk.ensure_path(root_path)
-    zk.set(root_path, initial_value.encode('utf-8'))
-    print(f"Node {root_path} created with value: {initial_value}")
+    zk.ensure_path(ROOT_PATH)
+    zk.set(ROOT_PATH, initial_value.encode('utf-8'))
+    print(f"Node {ROOT_PATH} created with value: {initial_value}")
 
     # Monitor children of root node
-    monitor_children(root_path)
+    monitor_children(ROOT_PATH)
 
     # Create an ephemeral node
-    create_ephemeral_node(ephemeral_path, initial_value)
+    create_ephemeral_node(EPHEMERAL_NODE, initial_value)
 
     # Monitor if ephemeral node dies
-    node_died(ephemeral_path)
+    node_died(EPHEMERAL_NODE)
 
     # Heartbeat demo
-    heartbeat_demo(root_path)
+    heartbeat_demo(ROOT_PATH)
 
     # Create a child node to trigger the children watcher
     child_path = "/demo/child"
@@ -69,8 +74,8 @@ if __name__ == "__main__":
 
     # Clean up
     zk.delete(child_path)
-    zk.delete(ephemeral_path)
-    zk.delete(root_path)
+    zk.delete(EPHEMERAL_NODE)
+    zk.delete(ROOT_PATH)
 
     # Stop the Zookeeper client
     zk.stop()
