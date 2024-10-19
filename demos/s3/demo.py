@@ -1,5 +1,5 @@
-from localstack_client.session import Session
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
+from localstack_client.session import Session
 
 # Initialize a session using LocalStack
 session = Session()
@@ -15,6 +15,7 @@ FOLDER_NAME = 'demo-folder/'
 MULTIPART_OBJECT_NAME = 'large-object.txt'
 MULTIPART_CONTENT = 'A' * 10 * 1024 * 1024  # 10MB of 'A'
 
+
 def create_s3_bucket(bucket_name):
     try:
         s3_client.create_bucket(Bucket=bucket_name)
@@ -22,18 +23,22 @@ def create_s3_bucket(bucket_name):
     except s3_client.exceptions.BucketAlreadyOwnedByYou:
         print(f"Bucket '{bucket_name}' already exists and is owned by you")
 
+
 def upload_object_to_s3(bucket_name, object_name, content):
-    s3_client.put_object(Bucket=bucket_name, Key=object_name, Body=content)
+    value = s3_client.put_object(Bucket=bucket_name, Key=object_name, Body=content)
     print(f"Object '{object_name}' uploaded to bucket '{bucket_name}'")
+
 
 def read_object_from_s3(bucket_name, object_name):
     response = s3_client.get_object(Bucket=bucket_name, Key=object_name)
     content = response['Body'].read().decode('utf-8')
     print(f"Read from S3: {content}")
 
+
 def create_folder(bucket_name, folder_name):
     s3_client.put_object(Bucket=bucket_name, Key=folder_name)
     print(f"Folder '{folder_name}' created in bucket '{bucket_name}'")
+
 
 def list_objects(bucket_name, prefix=''):
     response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
@@ -42,13 +47,16 @@ def list_objects(bucket_name, prefix=''):
     for obj in objects:
         print(f"  {obj['Key']}")
 
+
 def delete_object(bucket_name, object_name):
     s3_client.delete_object(Bucket=bucket_name, Key=object_name)
     print(f"Object '{object_name}' deleted from bucket '{bucket_name}'")
 
+
 def set_bucket_policy(bucket_name, policy):
     s3_client.put_bucket_policy(Bucket=bucket_name, Policy=policy)
     print(f"Policy set for bucket '{bucket_name}'")
+
 
 def multipart_upload(bucket_name, object_name, content):
     # Initiate the multipart upload
@@ -60,7 +68,7 @@ def multipart_upload(bucket_name, object_name, content):
     parts = []
     for i in range(0, len(content), part_size):
         part_number = len(parts) + 1
-        part_content = content[i:i+part_size]
+        part_content = content[i:i + part_size]
         part_response = s3_client.upload_part(
             Bucket=bucket_name,
             Key=object_name,
@@ -72,7 +80,7 @@ def multipart_upload(bucket_name, object_name, content):
             'ETag': part_response['ETag'],
             'PartNumber': part_number
         })
-    
+
     # Complete the multipart upload
     s3_client.complete_multipart_upload(
         Bucket=bucket_name,
@@ -81,6 +89,7 @@ def multipart_upload(bucket_name, object_name, content):
         UploadId=upload_id
     )
     print(f"Multipart upload for '{object_name}' completed")
+
 
 if __name__ == "__main__":
     try:
@@ -102,7 +111,7 @@ if __name__ == "__main__":
                     "Effect": "Allow",
                     "Principal": "*",
                     "Action": "s3:GetObject",
-                    "Resource": f"arn:aws:s3:::{BUCKET_NAME}/*"
+                    "Resource": f"arn:aws:s3:::{BUCKET_NAME}/*"  # ARN is an identifier for resources in AWS
                 }
             ]
         }
