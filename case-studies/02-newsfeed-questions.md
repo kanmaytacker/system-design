@@ -25,15 +25,22 @@ Along with the newsfeed, Facebook also has a profile page where you can see the 
 List all the entities that you think are necessary for the newsfeed and profile page
 
 ```
-- Entity 1
-    - Attribute 1
-    - Attribute 2
-- Entity 2
-    - Attribute 1
-    - Attribute 2
-- Entity 3
-    - Attribute 1
-    - Attribute 2
+- User
+    - User ID
+    - Name
+    - Email
+    - Relationship status
+    - Last active
+- User Friends
+    - User ID
+    - Friend ID
+- Post
+    - Post ID
+    - User ID
+    - Content
+    - Created Timestamp
+    - Updated Timestamp
+
 ```
 
 *Remember you would also need to store the friends of a user to fetch the newsfeed.*
@@ -46,14 +53,17 @@ List all the entities that you think are necessary for the newsfeed and profile 
 Screen - **Newsfeed**
 API calls - 
 ```
-- API 1(Params)
-- API 2(Params)
+- GetFriendsList(user_id): Get the user's friend list
+- GetFriendsPosts(user_id, pagination): Get recent posts made by the user's friends. Pagination used to enhance readablility and navigation.
+
 ```
 
 Screen - **Profile page**
 ```
-- API 1(Params)
-- API 2(Params)
+- GetUserProfile(user_id): Get the user's profile information
+- GetUserPosts(user_id, pagination): Get the user's own posts. Pagination used to enhance readablility and navigation.
+
+
 ```
 ---
 
@@ -62,44 +72,44 @@ Screen - **Profile page**
 
 **Question**: Write a query to fetch the posts by a user. This will be used to populate the profile page.
 
-**Answer**: ` `
+**Answer**: ` SELECT * FROM Posts WHERE user_id = <user_id> ORDER BY timestamp DESC LIMIT x OFFSET y; `
 
 **Question**: Write a query to fetch the posts by a user's friends. This will be used to populate the newsfeed.
 
-**Answer**: ` `
+**Answer**: ` SELECT * FROM User_friends a JOIN Posts b ON a.user_id = <user_id> AND b.user_id = a.friend_id AND b.timestamp < NOW - 30 days LIMIT x OFFSET y `
 
 ---
 ### Estimations - Users
 
 **Question**: How many daily active users (DAUs) does Facebook have? *You don't need to be exact, just provide a rough estimate. You can find this information online and then compare your answer with the actual number.*
 
-**Answer**: ` `
+**Answer**: ` As of September 2024, Facebook has about 2.11 billion daily active users (DAUs). This is a 5.5% increase from the previous year `
 
 ---
 
 **Question**: How many users can Facebook expect to have in 10 years? *You can assume an arbitrary growth rate based on the current number of users.*
 
-**Answer**: ` `
+**Answer**: ` In 10 years, assuming a constant growth rate of 5.5%, Facebook can expect to have approximately 3.6 billion daily active users (DAUs). ​​`
 
 ---
 
 **Question**: What is the size of a user record in bytes based on the schema you have created?
 
-**Answer**: ` `
+**Answer**: ` ID (4 bytes) + Name (~100 bytes) + Email (~100 bytes) + Relationship status (1 byte) + Last active (4 bytes) = 209 bytes. `
 
 ---
 
 **Question**: How much storage would you need for users in 10 years?
 
-**Formula**: `Total storage = _ * _`
+**Formula**: ` Total storage = Number of users * Size of user record `
 
-**Answer**: ` `
+**Answer**: ` 3.6 billion * 209 bytes = 752.4 gigabytes `
 
 ---
 
 **Question**: Do you need to shard the users table?
 
-**Answer**: ` `
+**Answer**: ` Yes, you would need to shard the users table as it would be too large to fit on a single machine. `
 
 ---
 
@@ -111,8 +121,8 @@ Screen - **Profile page**
 
 **Answer**:
 ```
-- Candidate key 1
-- Candidate key 2
+- Candidate key 1: User_ID
+- Candidate key 2: Post_ID
 ```
 
 ### Candidate key 1
@@ -121,10 +131,10 @@ Screen - **Profile page**
 
 **Answer**:
 ```
-- Operation 1
-    - Number of hops
-- Operation 2
-    - Number of hops
+- Operation 1: Fetch user’s profile page (Fetch the user details and posts)
+    - Number of hops: 1 (single shard based on user_id)
+- Operation 2: Fetch user’s newsfeed
+    - Number of hops: Multiple (as friend posts may be on different shards)
 ```
 
 ### Candidate key 2
@@ -133,13 +143,13 @@ Screen - **Profile page**
 
 **Answer**:
 ```
-- Operation 1
-    - Number of hops
-- Operation 2
-    - Number of hops
+- Operation 1: Fetch user’s profile page
+    - Number of hops: 1 (single shard based on post_id for posts)
+- Operation 2: Fetch user’s newsfeed
+    - Number of hops: Multiple (as friends' posts may be on different shards)
 ```
 
-**Final choice**: ` `
+**Final choice**: ` User_ID would be the better choice for sharding as it would reduce the number of hops required for fetching the user's profile page and other user-centric operations. `
 
 ---
 
@@ -150,41 +160,41 @@ Screen - **Profile page**
 
 **Question**: What percentage of the daily active users do you think create posts daily?
 
-**Answer**: ` `
+**Answer**: ` 1% `
 
 ---
 
 **Question**: How many posts do you think a user would make in a day?
 
-**Answer**: ` `
+**Answer**: ` 2 `
 
 ---
 
 **Question**: What is the total number of posts created in a day?
 
-**Formula**: `Total number of posts = _ * _ * _`
-**Answer**: ` `
+**Formula**: `Total number of posts = DAUs * Percentage of DAUs creating posts * Number of posts per user ` 
+**Answer**: ` 3.6 billion * 1% * 2 = 72 million `
 
 ---
 **Question**: What is the size of a post in bytes?
 *Based on the schema you have created, estimate the size of a post.*
 
-**Answer**: ` `
+**Answer**: ` Post ID (4 bytes) + User ID (4 bytes) + Content (~200 bytes) + Created Timestamp (8 bytes) + Updated Timestamp (8 bytes) = 224 bytes`
 
 ---
 **Question**: What is the total amount of data generated by posts in a day?
-**Formula**: `Total data generated = _ * _`
-**Answer**: ` `
+**Formula**: ` Total data generated = Total number of posts * Size of post `
+**Answer**: ` 72 million * 224 bytes = 16 GB `
 
 ---
 **Question**: How much data would you need to store for posts from the last 30 days?
 
-**Answer**: ` `
+**Answer**: ` 16 GB * 30 = 480 GB`
 
 ---
 **Question**: Do you need to shard the posts table? Specifically for the newsfeed use case where you don't need all the posts, only the recent ones.
 
-**Answer**: ` `
+**Answer**: ` No, you don't need to shard the posts table for the newsfeed use case. You can store the recent posts in a separate database and fetch them from there. `
 
 ---
 ### Final solution
@@ -195,24 +205,20 @@ Given the above, write the flows for each of the operations you have listed abov
 
 ---
 
-**Operation name**: ` `
+**Operation name**: `GetFriendsPosts `
 **Flow**:
 ```
-1. Step 1
-2. Step 2
-3. Step 3
-...
+1. Fetch the user's list of friends from the user's shard.
+2. For each friend, fetch the recent posts made by the friend from the secondary database.
 ```
 
 ---
 
-**Operation name**: ` `
+**Operation name**: ` Get profile page `
 **Flow**:
 ```
-1. Step 1
-2. Step 2
-3. Step 3
-...
+1. Fetch the user's details from the user's shard.
+2. Fetch the user's posts from the secondary database.
 ```
 
 ---
